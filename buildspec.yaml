@@ -20,6 +20,9 @@ phases:
       - echo Testing started on `date`
       - npm run test
       - echo Build started on `date`
+
+      - echo IMAGE_TAG
+      - echo $IMAGE_TAG
       
       - echo Building the Docker image...
       - docker build -t node-api:latest .
