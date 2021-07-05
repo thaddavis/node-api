@@ -3,7 +3,7 @@ Resources:
   - TargetService:
       Type: AWS::ECS::Service
       Properties:
-        TaskDefinition: "arn:aws:ecs:us-east-1:333427308013:task-definition/node-api:8"
+        TaskDefinition: "arn:aws:ecs:us-east-1:333427308013:task-definition/node-api:TASK_VERSION"
         LoadBalancerInfo:
           ContainerName: "node-api"
           ContainerPort: 3000

@@ -1,0 +1,46 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 10
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - aws --version
+      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 333427308013.dkr.ecr.us-east-1.amazonaws.com
+      - REPOSITORY_URI=333427308013.dkr.ecr.us-east-1.amazonaws.com/stock-temple-node-api
+      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      - IMAGE_TAG=${COMMIT_HASH:=latest}
+      - echo Installing source NPM dependencies...
+      - npm install
+  build:
+    commands:
+      - echo Testing started on `date`
+      - npm run test
+      - echo Build started on `date`
+      
+      - echo Building the Docker image...
+      - docker build -t $REPOSITORY_URI:latest .
+      - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
+      - docker push $REPOSITORY_URI:$IMAGE_TAG
+      
+      - sed -i "s/IMAGE_TAG/$IMAGE_TAG/" taskdef.json
+      - TASK_VERSION=$(aws ecs register-task-definition --cli-input-json file://taskdef.json | jq --raw-output '.taskDefinition.revision')
+      
+      - echo Debugging TASK_VERSION
+      - echo $TASK_VERSION
+
+      - sed -i "s/TASK_VERSION/$TASK_VERSION/" appspec.yaml
+      - echo Debugging appspec.yaml
+      - cat appspec.yaml
+  post_build:
+    commands:
+      #- echo Build completed on `date`
+      #- echo Pushing the Docker images...
+      #- docker push $REPOSITORY_URI:latest
+      #- docker push $REPOSITORY_URI:$IMAGE_TAG
+      #- echo Writing image definitions file...
+      #- printf '[{"name":"stock-temple-node-api","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+artifacts:
+    files: imagedefinitions.json
