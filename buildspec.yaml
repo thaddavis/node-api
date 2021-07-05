@@ -7,8 +7,6 @@ phases:
   pre_build:
     commands:
       - aws --version
-      # - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 333427308013.dkr.ecr.us-east-1.amazonaws.com
-      # - REPOSITORY_URI=333427308013.dkr.ecr.us-east-1.amazonaws.com/stock-temple-node-api
       - docker login -u $DOCKERHUB_USER -p $DOCKERHUB_PASSWORD
       - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       - IMAGE_TAG=${COMMIT_HASH:=latest}
@@ -30,7 +28,6 @@ phases:
       - docker push thaddavis/node-api:$IMAGE_TAG
       
       - sed -i "s/IMAGE_TAG/$IMAGE_TAG/" taskdef.json
-      # - aws ecs register-task-definition --cli-input-json file://taskdef.json
       - TASK_VERSION=$(aws ecs register-task-definition --cli-input-json file://taskdef.json | jq --raw-output '.taskDefinition.revision')
       
       - echo Debugging TASK_VERSION
@@ -41,11 +38,6 @@ phases:
       - cat appspec.yaml
   post_build:
     commands:
-      #- echo Build completed on `date`
-      #- echo Pushing the Docker images...
-      #- docker push $REPOSITORY_URI:latest
-      #- docker push $REPOSITORY_URI:$IMAGE_TAG
-      #- echo Writing image definitions file...
-      #- printf '[{"name":"stock-temple-node-api","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+      - echo Build completed on `date`
 artifacts:
     files: appspec.yaml
