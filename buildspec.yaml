@@ -30,8 +30,10 @@ phases:
       - docker push thaddavis/node-api:$IMAGE_TAG
       
       - sed -i "s/IMAGE_TAG/$IMAGE_TAG/" taskdef.json
-      - TASK_VERSION=$(aws ecs register-task-definition --cli-input-json file://taskdef.json | jq --raw-output '.taskDefinition.revision')
+      - aws ecs register-task-definition --cli-input-json file://taskdef.json
+      # - TASK_VERSION=$(aws ecs register-task-definition --cli-input-json file://taskdef.json | jq --raw-output '.taskDefinition.revision')
       
+      - TASK_VERSION=123
       - echo Debugging TASK_VERSION
       - echo $TASK_VERSION
 
