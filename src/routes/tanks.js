@@ -21,10 +21,20 @@ router.route('/')
     
   })
   
-router.route('/:id')
+router.route('/')
   .get(function (req, res) {
     // get and send tank data
-    res.send('get tank data')
+    // res.send('get tank data')
+
+    Tank.find({}, function(err, users) {
+      var userMap = {};
+  
+      users.forEach(function(user) {
+        userMap[user._id] = user;
+      });
+  
+      res.send(userMap);  
+    });
   });
 
 module.exports = router;
