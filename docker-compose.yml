@@ -1,0 +1,19 @@
+version: "3.9"  # optional since v1.27.0
+services:
+  api:
+    build: .
+    volumes:
+        - ./src:/usr/src/app/src
+        - ./nodemon.json:/usr/src/app/nodemon.json
+    ports:
+      - "3000:3000"
+    links:
+      - db
+  db:
+    ports:
+      - "27017:27017"
+    image: mongo
+    volumes:
+        - mongodbdata:/data/db
+volumes:
+  mongodbdata: {}

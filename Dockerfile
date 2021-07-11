@@ -1,5 +1,8 @@
 FROM node:14
 
+RUN apt-get update
+RUN apt-get install -y lsof
+
 # Create app directory
 WORKDIR /usr/src/app
 
@@ -15,5 +18,5 @@ RUN npm install
 # Bundle app source
 COPY . .
 
-EXPOSE 3000
-CMD [ "node", "index.js" ]
+EXPOSE 4000
+CMD [ "npm", "run", "dev" ]
